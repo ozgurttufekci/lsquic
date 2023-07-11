@@ -1,0 +1,35 @@
+Determining if the IP_DONTFRAG exist failed with the following output:
+Change Dir: /home/saas/lsquic/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_b2afb/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_b2afb.dir/build.make CMakeFiles/cmTC_b2afb.dir/build
+gmake[1]: Entering directory '/home/saas/lsquic/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b2afb.dir/CheckSymbolExists.c.o
+/usr/bin/cc   -DLSQUIC_DEBUG_NEXT_ADV_TICK=1 -DLSQUIC_CONN_STATS=1 -Wall -Wextra -Wno-unused-parameter -fno-omit-frame-pointer -Wno-missing-field-initializers -O0 -g3   -o CMakeFiles/cmTC_b2afb.dir/CheckSymbolExists.c.o -c /home/saas/lsquic/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+/home/saas/lsquic/CMakeFiles/CMakeTmp/CheckSymbolExists.c: In function ‘main’:
+/home/saas/lsquic/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: error: ‘IP_DONTFRAG’ undeclared (first use in this function); did you mean ‘IPV6_DONTFRAG’?
+    8 |   return ((int*)(&IP_DONTFRAG))[argc];
+      |                   ^~~~~~~~~~~
+      |                   IPV6_DONTFRAG
+/home/saas/lsquic/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: note: each undeclared identifier is reported only once for each function it appears in
+/home/saas/lsquic/CMakeFiles/CMakeTmp/CheckSymbolExists.c:4:14: warning: parameter ‘argc’ set but not used [-Wunused-but-set-parameter]
+    4 | int main(int argc, char** argv)
+      |          ~~~~^~~~
+gmake[1]: *** [CMakeFiles/cmTC_b2afb.dir/build.make:78: CMakeFiles/cmTC_b2afb.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/home/saas/lsquic/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_b2afb/fast] Error 2
+
+
+File /home/saas/lsquic/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <netinet/in.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef IP_DONTFRAG
+  return ((int*)(&IP_DONTFRAG))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}

@@ -28,6 +28,7 @@
 
 
 struct lsquic_conn_ctx;
+FILE *fptr;
 
 struct echo_server_ctx {
     TAILQ_HEAD(, lsquic_conn_ctx)   conn_ctxs;
@@ -47,6 +48,7 @@ struct lsquic_conn_ctx {
 static lsquic_conn_ctx_t *
 echo_server_on_new_conn (void *stream_if_ctx, lsquic_conn_t *conn)
 {
+    fptr = fopen("after.txt", "w");
     struct echo_server_ctx *server_ctx = stream_if_ctx;
     lsquic_conn_ctx_t *conn_h = calloc(1, sizeof(*conn_h));
     conn_h->conn = conn;
@@ -62,6 +64,7 @@ static void
 echo_server_on_conn_closed (lsquic_conn_t *conn)
 {
     lsquic_conn_ctx_t *conn_h = lsquic_conn_get_ctx(conn);
+    fclose(fptr);
     if (conn_h->server_ctx->n_conn)
     {
         --conn_h->server_ctx->n_conn;
@@ -129,6 +132,9 @@ echo_server_on_read (lsquic_stream_t *stream, lsquic_stream_ctx_t *st_h)
     else if ('\n' == st_h->buf[ st_h->buf_off - 1 ])
     {
         /* Found end of line: echo it back */
+        fprintf(fptr, "%s\n", st_h->buf);
+        printf("%.*s", (int) st_h->buf_off, st_h->buf);
+        fflush(stdout);
         lsquic_stream_wantwrite(stream, 1);
         lsquic_stream_wantread(stream, 0);
     }
@@ -149,6 +155,7 @@ static void
 echo_server_on_write (lsquic_stream_t *stream, lsquic_stream_ctx_t *st_h)
 {
     lsquic_stream_write(stream, st_h->buf, st_h->buf_off);
+    //printf("%.*s", (int) st_h->buf_off, st_h->buf);
     st_h->buf_off = 0;
     lsquic_stream_flush(stream);
     lsquic_stream_wantwrite(stream, 0);

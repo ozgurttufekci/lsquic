@@ -34,6 +34,7 @@
 #include "../src/liblsquic/lsquic_logger.h"
 
 struct lsquic_conn_ctx;
+FILE *fptr;
 
 struct echo_client_ctx {
     struct lsquic_conn_ctx  *conn_h;
@@ -50,6 +51,9 @@ static lsquic_conn_ctx_t *
 echo_client_on_new_conn (void *stream_if_ctx, lsquic_conn_t *conn)
 {
     struct echo_client_ctx *client_ctx = stream_if_ctx;
+    fptr = fopen("before.txt", "w");
+    // write test data to file
+    fputs("This is testing for fprintf...\n", fptr);
     lsquic_conn_ctx_t *conn_h = malloc(sizeof(*conn_h));
     conn_h->conn = conn;
     conn_h->client_ctx = client_ctx;
@@ -62,6 +66,7 @@ echo_client_on_new_conn (void *stream_if_ctx, lsquic_conn_t *conn)
 static void
 echo_client_on_conn_closed (lsquic_conn_t *conn)
 {
+    fclose(fptr);
     lsquic_conn_ctx_t *conn_h = lsquic_conn_get_ctx(conn);
     LSQ_NOTICE("Connection closed");
     prog_stop(conn_h->client_ctx->prog);
@@ -139,8 +144,8 @@ echo_client_on_read (lsquic_stream_t *stream, lsquic_stream_ctx_t *st_h)
         lsquic_stream_shutdown(stream, 2);
         return;
     }
-    printf("%c", c);
-    fflush(stdout);
+    // printf("%c", c);
+    // fflush(stdout);
     if ('\n' == c)
     {
         event_add(st_h->read_stdin_ev, NULL);
@@ -156,8 +161,8 @@ echo_client_on_write (lsquic_stream_t *stream, lsquic_stream_ctx_t *st_h)
      * Don't do it in a real program.
      */
     lsquic_stream_write(stream, st_h->buf, st_h->buf_off);
+    fprintf(fptr, "%s\n", st_h->buf);
     st_h->buf_off = 0;
-
     lsquic_stream_flush(stream);
     lsquic_stream_wantwrite(stream, 0);
     lsquic_stream_wantread(stream, 1);
